@@ -6,45 +6,65 @@
 
 .results-empty {
     text-align: center;
-    padding: 40px;
+    padding: 60px;
     color: var(--text-secondary);
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    border: 1px dashed var(--glass-border);
 }
 
 .section-title {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 16px;
+    background: var(--accent-primary);
+    border-radius: 2px;
 }
 
 /* Detailed Metrics with Progress Rings */
 .detailed-metrics {
-    background: var(--bg-secondary);
-    border-radius: var(--border-radius-sm);
-    padding: 20px;
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 24px;
     margin-bottom: 24px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur));
 }
 
 .metrics-rings {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 32px;
 }
 
 /* Training History */
 .training-history {
-    background: var(--bg-secondary);
-    border-radius: var(--border-radius-sm);
-    padding: 20px;
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 24px;
     margin-bottom: 24px;
+    border: 1px solid var(--glass-border);
 }
 
 .spark-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .spark-labels {
@@ -53,6 +73,7 @@
     width: 300px;
     font-size: 11px;
     color: var(--text-muted);
+    font-family: monospace;
 }
 
 /* Responsive */

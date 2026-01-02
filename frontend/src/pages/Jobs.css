@@ -1,5 +1,6 @@
 .jobs-page {
     max-width: 1400px;
+    margin: 0 auto;
 }
 
 /* Filters Bar */
@@ -8,23 +9,34 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    background: var(--glass-bg);
+    padding: 16px 24px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
 }
 
 .filters-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius-sm);
     color: var(--text-secondary);
+    transition: border-color var(--transition-fast);
+}
+
+.filter-group:focus-within {
+    border-color: var(--accent-primary);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .filter-select {
@@ -34,25 +46,25 @@
     font-size: 14px;
     cursor: pointer;
     outline: none;
+    font-weight: 500;
 }
 
 .filter-select option {
-    background: var(--bg-secondary);
+    background: #0A0A12;
+    /* Fallback for options */
 }
 
 .filter-input {
-    padding: 10px 14px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
     color: var(--text-primary);
     font-size: 14px;
-    width: 200px;
+    width: 240px;
 }
 
 .filter-input:focus {
     outline: none;
-    border-color: var(--accent-primary);
 }
 
 .spin {
@@ -61,7 +73,16 @@
 
 /* Jobs Table */
 .jobs-table-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
     overflow: hidden;
+    backdrop-filter: blur(12px);
+}
+
+.table th,
+.table td {
+    padding: 16px 24px;
 }
 
 .table th:last-child,
@@ -72,21 +93,25 @@
 .job-link {
     color: var(--text-primary);
     text-decoration: none;
-    font-weight: 500;
-    transition: color var(--transition-fast);
+    font-weight: 600;
+    transition: all var(--transition-fast);
 }
 
 .job-link:hover {
     color: var(--accent-primary);
+    text-decoration: underline;
 }
 
 .domain-badge {
     display: inline-block;
-    padding: 4px 10px;
-    background: var(--bg-secondary);
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    font-size: 11px;
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .state-text {
@@ -102,20 +127,32 @@
 
 .duration-text {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     font-family: monospace;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .action-buttons {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 8px;
 }
 
 .action-buttons .btn-icon {
     width: 32px;
     height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-buttons .btn-icon:hover {
+    background: var(--accent-primary);
+    color: white;
 }
 
 /* Pagination */
@@ -131,4 +168,5 @@
 .pagination-info {
     font-size: 14px;
     color: var(--text-secondary);
+    font-weight: 500;
 }

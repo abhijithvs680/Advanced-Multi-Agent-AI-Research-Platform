@@ -53,9 +53,10 @@ class ReportGenerator:
         md.append("")
         
         # Executive Summary
-        if job_data.get('analysis'):
+        analysis = job_data.get('analysis') or {}
+        if analysis:
             md.append("## Executive Summary")
-            md.append(job_data['analysis'].get('summary', 'No summary available.'))
+            md.append(analysis.get('summary', 'No summary available.'))
             md.append("")
         
         # Literature Review
@@ -201,12 +202,13 @@ class ReportGenerator:
             latex.append("")
         
         # Results
-        if job_data.get('result'):
+        result = job_data.get('result') or {}
+        if result:
             latex.append(r"\section{Results}")
-            result = job_data['result']
-            if result.get('best_model'):
-                latex.append(f"Best performing model: {self._latex_escape(result['best_model'].get('model_type', 'N/A'))}")
-                latex.append(f" with score {result['best_model'].get('score', 0):.4f}.")
+            best_model = result.get('best_model') or {}
+            if best_model:
+                latex.append(f"Best performing model: {self._latex_escape(best_model.get('model_type', 'N/A'))}")
+                latex.append(f" with score {best_model.get('score', 0):.4f}.")
             latex.append("")
         
         # References
@@ -270,9 +272,10 @@ class ReportGenerator:
         ))
         
         # Summary
-        if job_data.get('analysis'):
+        analysis = job_data.get('analysis') or {}
+        if analysis:
             cells.append(new_markdown_cell(
-                f"## Executive Summary\n\n{job_data['analysis'].get('summary', 'No summary.')}"
+                f"## Executive Summary\n\n{analysis.get('summary', 'No summary.')}"
             ))
         
         # Papers analysis
@@ -295,7 +298,8 @@ class ReportGenerator:
             ))
         
         # Results
-        if job_data.get('result'):
+        result = job_data.get('result') or {}
+        if result:
             cells.append(new_markdown_cell("## Results"))
             cells.append(new_code_cell(
                 "# Display results\n"
@@ -356,12 +360,13 @@ class ReportGenerator:
             story.append(Spacer(1, 15))
         
         # Results table
-        if job_data.get('result', {}).get('best_model'):
+        result = job_data.get('result') or {}
+        best_model = result.get('best_model') or {}
+        if best_model:
             story.append(Paragraph("Results", styles['Heading2']))
-            bm = job_data['result']['best_model']
             data = [
-                ["Model Type", bm.get('model_type', 'N/A')],
-                ["Score", f"{bm.get('score', 0):.4f}"]
+                ["Model Type", best_model.get('model_type', 'N/A')],
+                ["Score", f"{best_model.get('score', 0):.4f}"]
             ]
             table = Table(data, colWidths=[150, 250])
             table.setStyle(TableStyle([

@@ -1,5 +1,31 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
+import {
+    Chart as ChartJS,
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    PointElement,
+    LineElement,
+} from 'chart.js';
+import { Doughnut, Bar, Line } from 'react-chartjs-2';
 import './Charts.css';
+
+// Register Chart.js components
+ChartJS.register(
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    PointElement,
+    LineElement
+);
 
 interface DataPoint {
     label: string;
@@ -15,53 +41,52 @@ interface BarChartProps {
 }
 
 export function BarChart({ data, title, height = 200, showValues = true }: BarChartProps) {
-    const maxValue = useMemo(() => Math.max(...data.map(d => d.value || 0), 1), [data]);
+    const chartData = {
+        labels: data.map(d => d.label),
+        datasets: [{
+            data: data.map(d => d.value ?? 0),
+            backgroundColor: data.map((d, i) => d.color || [
+                'rgba(99, 102, 241, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(236, 72, 153, 0.8)'
+            ][i % 5]),
+            borderRadius: 6,
+            borderWidth: 0,
+        }]
+    };
 
-    const defaultColors = [
-        'var(--accent-primary)',
-        'var(--status-completed)',
-        'var(--accent-secondary)',
-        '#f59e0b',
-        '#8b5cf6',
-        '#ec4899'
-    ];
+    const options = {
+        indexAxis: 'y' as const,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: { display: !!title, text: title, color: '#fff' },
+            tooltip: {
+                backgroundColor: 'rgba(15, 15, 25, 0.9)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 1,
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 10 } }
+            },
+            y: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: 'rgba(255, 255, 255, 0.8)', font: { size: 11 } }
+            }
+        }
+    };
 
     return (
-        <div className="chart bar-chart">
-            {title && <h3 className="chart-title">{title}</h3>}
-            <div className="bar-chart-container" style={{ height }}>
-                {data.map((item, index) => {
-                    const val = item.value || 0;
-                    const percentage = (val / maxValue) * 100;
-                    const color = item.color || defaultColors[index % defaultColors.length];
-
-                    return (
-                        <div key={item.label} className="bar-item">
-                            <div className="bar-label">{item.label}</div>
-                            <div className="bar-track">
-                                <div
-                                    className="bar-fill"
-                                    style={{
-                                        width: `${percentage}%`,
-                                        backgroundColor: color
-                                    }}
-                                >
-                                    {showValues && (
-                                        <span className="bar-value">
-                                            {typeof item.value === 'number'
-                                                ? (item.value < 1
-                                                    ? (item.value * 100).toFixed(1) + '%'
-                                                    : item.value.toFixed(2))
-                                                : 'N/A'
-                                            }
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+        <div className="chart bar-chart" style={{ height: height + 60 }}>
+            <Bar data={chartData} options={options} />
         </div>
     );
 }
@@ -75,64 +100,42 @@ interface DonutChartProps {
 export function DonutChart({ data, title, size = 160 }: DonutChartProps) {
     const total = useMemo(() => data.reduce((sum, d) => sum + (d.value || 0), 0), [data]);
 
-    const defaultColors = [
-        '#3b82f6',
-        '#22c55e',
-        '#f59e0b',
-        '#ef4444',
-        '#8b5cf6',
-        '#ec4899'
-    ];
+    const chartData = {
+        labels: data.map(d => d.label),
+        datasets: [{
+            data: data.map(d => d.value ?? 0),
+            backgroundColor: data.map((d, i) => d.color || [
+                '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+            ][i % 6]),
+            borderWidth: 0,
+            hoverOffset: 10
+        }]
+    };
 
-    // Calculate segments
-    let cumulativePercent = 0;
-    const segments = data.map((item, index) => {
-        const val = item.value || 0;
-        const percent = total > 0 ? (val / total) * 100 : 0;
-        const startPercent = cumulativePercent;
-        cumulativePercent += percent;
-
-        return {
-            ...item,
-            percent,
-            startPercent,
-            color: item.color || defaultColors[index % defaultColors.length]
-        };
-    });
-
-    // Create conic-gradient
-    const gradientStops = segments.map(seg =>
-        `${seg.color} ${seg.startPercent}% ${seg.startPercent + seg.percent}%`
-    ).join(', ');
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+            legend: {
+                position: 'right' as const,
+                labels: { color: 'rgba(255, 255, 255, 0.7)', font: { size: 11 }, padding: 15 }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(15, 15, 25, 0.9)',
+                padding: 12,
+            }
+        }
+    };
 
     return (
-        <div className="chart donut-chart">
+        <div className="chart donut-chart" style={{ height: size + 80 }}>
             {title && <h3 className="chart-title">{title}</h3>}
-            <div className="donut-container">
-                <div
-                    className="donut-ring"
-                    style={{
-                        width: size,
-                        height: size,
-                        background: `conic-gradient(${gradientStops})`
-                    }}
-                >
-                    <div className="donut-center">
-                        <span className="donut-total">{total.toFixed(0)}</span>
-                        <span className="donut-label">Total</span>
-                    </div>
-                </div>
-                <div className="donut-legend">
-                    {segments.map(seg => (
-                        <div key={seg.label} className="legend-item">
-                            <span
-                                className="legend-color"
-                                style={{ backgroundColor: seg.color }}
-                            />
-                            <span className="legend-label">{seg.label}</span>
-                            <span className="legend-value">{seg.percent.toFixed(1)}%</span>
-                        </div>
-                    ))}
+            <div className="donut-wrapper" style={{ position: 'relative', height: size }}>
+                <Doughnut data={chartData} options={options} />
+                <div className="donut-center-overlay">
+                    <span className="donut-total">{total.toFixed(0)}</span>
+                    <span className="donut-label">Total</span>
                 </div>
             </div>
         </div>
@@ -153,7 +156,7 @@ export function MetricCard({ label, value, change, icon, color }: MetricCardProp
         : (value ?? 'N/A');
 
     return (
-        <div className="metric-card" style={{ borderTopColor: color }}>
+        <div className="metric-card" style={{ borderTop: `2px solid ${color}` }}>
             {icon && <div className="metric-icon" style={{ color }}>{icon}</div>}
             <div className="metric-content">
                 <div className="metric-value">{formattedValue}</div>
@@ -176,34 +179,29 @@ interface LineSparkProps {
 }
 
 export function LineSpark({ data, color = 'var(--accent-primary)', height = 40, width = 120 }: LineSparkProps) {
-    if (!data || data.length < 2) return null;
+    const chartData = {
+        labels: data.map((_, i) => i),
+        datasets: [{
+            data: data,
+            borderColor: color,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            fill: false
+        }]
+    };
 
-    // Filter out invalid values and handle nulls
-    const validData = data.map(v => v ?? 0).filter(v => typeof v === 'number' && !isNaN(v));
-    if (validData.length < 2) return null;
+    const options = {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+            x: { display: false },
+            y: { display: false }
+        }
+    };
 
-    const min = Math.min(...validData);
-    const max = Math.max(...validData);
-    const range = max - min || 1;
-
-    const points = validData.map((value, index) => {
-        const x = (index / (validData.length - 1)) * width;
-        const y = height - ((value - min) / range) * height;
-        return `${x},${y}`;
-    }).join(' ');
-
-    return (
-        <svg className="line-spark" width={width} height={height}>
-            <polyline
-                fill="none"
-                stroke={color}
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={points}
-            />
-        </svg>
-    );
+    return <Line data={chartData} options={options} width={width} height={height} />;
 }
 
 interface ProgressRingProps {
@@ -218,45 +216,38 @@ interface ProgressRingProps {
 export function ProgressRing({
     value,
     max = 100,
-    size = 80,
-    strokeWidth = 8,
+    size = 100,
     color = 'var(--accent-primary)',
     label
 }: ProgressRingProps) {
     const safeValue = value ?? 0;
-    const radius = (size - strokeWidth) / 2;
-    const circumference = radius * 2 * Math.PI;
-    const percent = Math.min(safeValue / max, 1);
-    const offset = circumference - (percent * circumference);
+    const chartData = {
+        datasets: [{
+            data: [safeValue, max - safeValue],
+            backgroundColor: [color, 'rgba(255, 255, 255, 0.05)'],
+            borderWidth: 0,
+            circumference: 360,
+            rotation: 0,
+        }]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '80%',
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        }
+    };
 
     return (
-        <div className="progress-ring-container">
-            <svg className="progress-ring" width={size} height={size}>
-                <circle
-                    className="progress-ring-bg"
-                    stroke="var(--border-color)"
-                    fill="none"
-                    strokeWidth={strokeWidth}
-                    r={radius}
-                    cx={size / 2}
-                    cy={size / 2}
-                />
-                <circle
-                    className="progress-ring-fill"
-                    stroke={color}
-                    fill="none"
-                    strokeWidth={strokeWidth}
-                    strokeLinecap="round"
-                    strokeDasharray={`${circumference} ${circumference}`}
-                    strokeDashoffset={offset}
-                    r={radius}
-                    cx={size / 2}
-                    cy={size / 2}
-                    style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-                />
-            </svg>
-            <div className="progress-ring-value">
-                {(percent * 100).toFixed(0)}%
+        <div className="progress-ring-chart-container" style={{ width: size }}>
+            <div className="progress-ring-wrapper" style={{ height: size, width: size, position: 'relative' }}>
+                <Doughnut data={chartData} options={options} />
+                <div className="progress-ring-value-overlay">
+                    {((safeValue / max) * 100).toFixed(0)}%
+                </div>
             </div>
             {label && <div className="progress-ring-label">{label}</div>}
         </div>

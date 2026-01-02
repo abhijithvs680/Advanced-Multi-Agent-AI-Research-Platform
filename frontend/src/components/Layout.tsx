@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
             <Header />
             <main
                 className="main-content"
-                style={{ marginLeft: sidebarCollapsed ? '72px' : 'var(--sidebar-width)' }}
+                style={{ marginLeft: sidebarCollapsed ? '80px' : 'var(--sidebar-width)' }}
             >
                 {children}
             </main>

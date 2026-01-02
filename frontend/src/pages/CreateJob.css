@@ -1,60 +1,75 @@
 .create-job-page {
-    max-width: 1100px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .create-container {
     display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 24px;
+    grid-template-columns: 1fr 300px;
+    /* Reduced side panel width */
+    gap: 32px;
     align-items: start;
 }
 
-/* Form */
+/* Form Area - Glass */
 .create-form {
-    padding: 32px;
+    padding: 40px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--border-radius);
+    box-shadow: var(--glass-shadow);
 }
 
 .form-label {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
 }
 
 .form-hint {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     margin-top: 8px;
+    line-height: 1.5;
 }
 
 /* Domain Suggestions */
 .domain-suggestions {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 10px;
+    margin-top: 16px;
 }
 
 .domain-tag {
-    padding: 6px 12px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    font-size: 13px;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all var(--transition-bounce);
     font-family: inherit;
 }
 
 .domain-tag:hover {
     border-color: var(--accent-primary);
-    color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.1);
+    color: white;
+    transform: translateY(-1px);
 }
 
 .domain-tag.active {
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
+    background: var(--gradient-primary);
+    border-color: transparent;
     color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 /* Advanced Toggle */
@@ -62,49 +77,67 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 0;
+    padding: 16px 0;
     background: transparent;
     border: none;
     color: var(--text-secondary);
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: color var(--transition-fast);
+    transition: all var(--transition-fast);
     font-family: inherit;
+    width: 100%;
+    margin-top: 24px;
+    border-top: 1px solid var(--glass-border);
 }
 
 .advanced-toggle:hover {
     color: var(--accent-primary);
+    padding-left: 4px;
+    /* subtle slide */
 }
 
-/* Advanced Settings */
+/* Advanced Settings - Slide Down */
 .advanced-settings {
-    padding: 20px;
-    background: var(--bg-secondary);
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: var(--border-radius-sm);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    border: 1px solid var(--glass-border);
 }
 
 /* Form Actions */
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border-color);
-    margin-top: 24px;
+    gap: 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--glass-border);
+    margin-top: 32px;
 }
 
-/* Info Panel */
+/* Side Pannel - Info */
 .info-panel {
     position: sticky;
-    top: calc(var(--header-height) + 24px);
+    top: calc(var(--header-height) + 32px);
+}
+
+.info-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--border-radius);
+    padding: 24px;
 }
 
 .info-card h3 {
     font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .info-steps {
@@ -115,9 +148,10 @@
 
 .info-steps li {
     display: flex;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-color);
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
 }
 
 .info-steps li:last-child {
@@ -125,21 +159,31 @@
 }
 
 .step-icon {
-    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--accent-primary);
     flex-shrink: 0;
 }
 
 .info-steps strong {
     display: block;
     font-size: 14px;
-    color: var(--text-primary);
+    color: white;
     margin-bottom: 4px;
+    font-weight: 600;
 }
 
 .info-steps p {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 13px;
+    color: var(--text-muted);
     margin: 0;
+    line-height: 1.4;
 }
 
 @media (max-width: 900px) {
@@ -149,5 +193,9 @@
 
     .info-panel {
         position: static;
+    }
+
+    .create-form {
+        padding: 24px;
     }
 }

@@ -5,7 +5,6 @@ import {
     PlusCircle,
     Settings,
     Activity,
-    Brain,
     ChevronLeft
 } from 'lucide-react';
 import './Sidebar.css';
@@ -37,7 +36,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <div className="sidebar-header">
                 <div className="logo">
                     <div className="logo-icon">
-                        <Brain size={28} />
+                        <img src="/vite.svg" alt="Platform Logo" style={{ width: 32, height: 32 }} />
                     </div>
                     {!collapsed && (
                         <div className="logo-text">

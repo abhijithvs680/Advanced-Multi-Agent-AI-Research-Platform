@@ -1,38 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg
-    width="512"
-    height="512"
-    viewBox="0 0 512 512"
-    xmlns="http://www.w3.org/2000/svg"
-    role="img"
-    aria-label="AI Logo">
+  width="256"
+  height="256"
+  viewBox="0 0 256 256"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="Brain icon">
 
-    <!-- Background -->
-    <rect x="0" y="0" width="512" height="512" rx="96" fill="#0F172A"/>
+  <!-- Background -->
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="#8B5CF6"/>
 
-    <!-- Neural node circle -->
-    <circle cx="256" cy="256" r="120" fill="none" stroke="#38BDF8" stroke-width="10"/>
+  <!-- Brain outline -->
+  <path
+    d="
+      M128 64
+      C92 64 72 92 80 120
+      C56 132 60 172 96 176
+      C104 196 128 196 128 196
+      C128 196 152 196 160 176
+      C196 172 200 132 176 120
+      C184 92 164 64 128 64
+      Z
+    "
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="10"
+    stroke-linejoin="round"
+  />
 
-    <!-- Neural connections -->
-    <line x1="256" y1="96" x2="256" y2="176" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="256" y1="336" x2="256" y2="416" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="96" y1="256" x2="176" y2="256" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="336" y1="256" x2="416" y2="256" stroke="#38BDF8" stroke-width="6"/>
+  <!-- Brain folds (left) -->
+  <path d="M104 84 C92 92 92 108 104 116" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M96 120 C84 132 88 148 104 152" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M108 152 C96 164 108 176 120 172" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
 
-    <line x1="146" y1="146" x2="206" y2="206" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="366" y1="146" x2="306" y2="206" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="146" y1="366" x2="206" y2="306" stroke="#38BDF8" stroke-width="6"/>
-    <line x1="366" y1="366" x2="306" y2="306" stroke="#38BDF8" stroke-width="6"/>
+  <!-- Brain folds (right) -->
+  <path d="M152 84 C164 92 164 108 152 116" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M160 120 C172 132 168 148 152 152" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M148 152 C160 164 148 176 136 172" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
 
-    <!-- AI text -->
-    <text
-        x="256"
-        y="286"
-        text-anchor="middle"
-        font-size="96"
-        font-weight="700"
-        fill="#E5E7EB"
-        font-family="Inter, Arial, sans-serif">
-        AI
-    </text>
+  <!-- Center split -->
+  <line
+    x1="128"
+    y1="72"
+    x2="128"
+    y2="188"
+    stroke="#FFFFFF"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
 </svg>

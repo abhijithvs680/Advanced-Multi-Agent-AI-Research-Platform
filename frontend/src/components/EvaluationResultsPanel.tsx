@@ -46,7 +46,7 @@ export default function EvaluationResultsPanel({ data }: EvaluationResultsPanelP
                     <h3 className="section-title">
                         <ListTree size={16} /> Feature Importance
                     </h3>
-                    <div className="card-bg p-4">
+                    <div className="">
                         <BarChart data={importanceData} height={250} />
                     </div>
                 </div>

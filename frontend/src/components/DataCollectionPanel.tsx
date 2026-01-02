@@ -60,7 +60,7 @@ export default function DataCollectionPanel({ data }: DataCollectionPanelProps) 
                         <h3 className="section-title">
                             <AlertCircle size={16} /> Missing Values (%)
                         </h3>
-                        <div className="card-bg p-4">
+                        <div className="">
                             <BarChart
                                 data={missingData}
                                 height={180}

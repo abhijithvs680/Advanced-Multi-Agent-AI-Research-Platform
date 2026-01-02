@@ -376,7 +376,6 @@ export default function JobDetails({ addToast }: JobDetailsProps) {
                 </div>
 
                 <div className="card result-card full-width">
-                    <h2 className="card-title">Live Execution Dashboard</h2>
                     <WorkflowDataTabs
                         jobId={job.id}
                         stageResults={mergedStageResults}

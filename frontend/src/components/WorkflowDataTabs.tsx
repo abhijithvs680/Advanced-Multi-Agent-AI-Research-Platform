@@ -54,7 +54,7 @@ export default function WorkflowDataTabs({
     };
 
     return (
-        <div className="workflow-data-tabs card">
+        <div className="workflow-data-tabs">
             <div className="tabs-header">
                 <div className="tabs-list">
                     {tabs.map(tab => (

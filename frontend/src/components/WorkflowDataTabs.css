@@ -4,14 +4,13 @@
     display: flex;
     flex-direction: column;
     min-height: 600px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
+    overflow: hidden;
 }
 
 .tabs-header {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--glass-border);
     padding: 0 16px;
-    background: var(--bg-tertiary);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .tabs-list {
@@ -23,7 +22,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 16px 20px;
+    padding: 18px 24px;
     background: none;
     border: none;
     color: var(--text-secondary);
@@ -31,6 +30,7 @@
     cursor: pointer;
     position: relative;
     transition: all 0.2s ease;
+    font-size: 14px;
 }
 
 .tab-item:hover {
@@ -39,7 +39,7 @@
 }
 
 .tab-item.active {
-    color: var(--accent-primary);
+    color: white;
 }
 
 .tab-item.active::after {
@@ -48,8 +48,10 @@
     bottom: -1px;
     left: 0;
     right: 0;
-    height: 2px;
-    background: var(--accent-primary);
+    height: 3px;
+    background: var(--gradient-primary);
+    box-shadow: 0 -2px 10px rgba(99, 102, 241, 0.5);
+    border-radius: 3px 3px 0 0;
 }
 
 .tab-item.completed {
@@ -60,29 +62,9 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--accent-primary);
+    background: currentColor;
     display: inline-block;
-}
-
-.pulse {
-    animation: pulse-animation 2s infinite;
-}
-
-@keyframes pulse-animation {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-    }
-
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-    }
+    box-shadow: 0 0 6px currentColor;
 }
 
 .tab-panel {
@@ -93,7 +75,7 @@
 
 /* Stage Panels Shared */
 .stage-panel {
-    animation: fade-in 0.3s ease;
+    animation: fade-in 0.4s ease;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -102,20 +84,20 @@
 .panel-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 
 .card-bg {
-    background: var(--bg-secondary);
+    background: rgba(255, 255, 255, 0.02);
     border-radius: var(--border-radius-sm);
-    padding: 16px;
-    border: 1px solid var(--border-color);
+    padding: 20px;
+    border: 1px solid var(--glass-border);
 }
 
 .grid-auto {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
 }
 
 .panel-row {
@@ -132,7 +114,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .hypothesis-header {
@@ -144,45 +126,44 @@
 .hypothesis-tag {
     font-weight: 700;
     color: var(--accent-primary);
-    font-size: 12px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .confidence-badge {
     font-size: 11px;
     background: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
-    padding: 2px 8px;
-    border-radius: 12px;
+    color: #34d399;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .hypothesis-statement {
     font-size: 15px;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .hypothesis-rationale {
     font-size: 13px;
     color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 8px;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    font-style: italic;
 }
 
 /* Data Panel */
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    gap: 20px;
 }
 
-.quality-score-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 140px;
-}
-
+/* Metadata List */
 .metadata-list {
     display: flex;
     flex-direction: column;
@@ -191,8 +172,8 @@
 .metadata-item {
     display: flex;
     justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .metadata-item:last-child {
@@ -202,94 +183,116 @@
 /* Training Panel */
 .params-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
 }
 
 .param-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .param-name {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .param-value {
     font-family: monospace;
-    font-size: 13px;
-    color: var(--accent-secondary);
+    font-size: 14px;
+    color: var(--accent-highlight);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
 }
 
 .overall-progress-bar {
     width: 200px;
-    height: 4px;
-    background: var(--border-color);
-    border-radius: 2px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
     overflow: hidden;
     margin-top: 12px;
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--accent-primary);
+    background: var(--gradient-primary);
     transition: width 0.3s ease;
 }
 
 /* Evaluation Panel */
 .recommendation-hero {
     display: flex;
-    gap: 24px;
-    padding: 24px;
+    gap: 32px;
+    padding: 32px;
     align-items: center;
     border: 1px solid var(--accent-primary);
-    background: linear-gradient(to right, rgba(59, 130, 246, 0.05), transparent);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), transparent);
+    border-radius: var(--border-radius);
+    position: relative;
+    overflow: hidden;
+}
+
+.recommendation-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent-primary);
+    box-shadow: 0 0 12px var(--accent-primary);
 }
 
 .hero-label {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 .hero-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
 }
 
 .hero-score {
     font-weight: 600;
-    color: #22c55e;
-    margin-bottom: 8px;
+    color: #34d399;
 }
 
 .comparison-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .comparison-table th {
     text-align: left;
-    padding: 12px;
+    padding: 16px;
     font-size: 12px;
     color: var(--text-muted);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--glass-border);
+    text-transform: uppercase;
 }
 
 .comparison-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 16px;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-primary);
 }
 
 .rank-1 {
     background: rgba(34, 197, 94, 0.05);
 }
 
-/* Shared components */
 .stage-pending {
     display: flex;
     flex-direction: column;
@@ -298,20 +301,6 @@
     min-height: 300px;
     color: var(--text-muted);
     gap: 16px;
-}
-
-.spin {
-    animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 @keyframes fade-in {
@@ -330,4 +319,30 @@
     .panel-row {
         flex-direction: column;
     }
+}
+
+/* Research Results Specifics */
+.summary-content {
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.finding-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.finding-bullet {
+    color: var(--accent-primary);
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.finding-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-primary);
 }
