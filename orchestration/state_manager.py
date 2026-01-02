@@ -1,4 +1,4 @@
-from shared.types import WorkflowState
+from shared.models import WorkflowState
 from shared.logger import get_logger
 from typing import Dict, Any, List
 from datetime import datetime

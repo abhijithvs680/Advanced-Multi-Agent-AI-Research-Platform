@@ -82,10 +82,11 @@ class WorkflowWorker:
                 )
                 
                 # Update job with result
+                from shared.utils import sanitize_for_json
                 job.status = JobStatus.COMPLETED
                 job.completed_at = datetime.utcnow()
                 job.current_state = WorkflowState.COMPLETED
-                job.result = result
+                job.result = sanitize_for_json(result)
                 db.commit()
                 
                 logger.info(

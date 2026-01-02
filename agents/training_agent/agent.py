@@ -226,6 +226,20 @@ class EnhancedTrainingAgent(BaseAgent):
         
         for model_type in model_types:
             self.logger.info("training_model", model_type=model_type)
+            
+            # Emit progress for start of model training
+            if self.config.get('job_id'):
+                try:
+                    from api.routes.websocket import emit_agent_progress
+                    asyncio.create_task(emit_agent_progress(
+                        job_id=self.config['job_id'],
+                        agent_name="training",
+                        step=f"Training {model_type}",
+                        progress=float(len(model_results)) / len(model_types) * 100
+                    ))
+                except Exception:
+                    pass
+
             start_time = time.time()
             
             try:
@@ -281,6 +295,20 @@ class EnhancedTrainingAgent(BaseAgent):
                     accuracy=metrics['accuracy'],
                     time=training_time
                 )
+                
+                # Emit progress for completed model training
+                if self.config.get('job_id'):
+                    try:
+                        from api.routes.websocket import emit_agent_progress
+                        asyncio.create_task(emit_agent_progress(
+                            job_id=self.config['job_id'],
+                            agent_name="training",
+                            step=f"Finished {model_type}",
+                            progress=float(len(model_results)) / len(model_types) * 100,
+                            details={"metrics": metrics}
+                        ))
+                    except Exception:
+                        pass
                 
             except Exception as e:
                 self.logger.error("model_training_failed", model_type=model_type, error=str(e))
@@ -418,9 +446,21 @@ class EnhancedTrainingAgent(BaseAgent):
                 shap_values = explainer.shap_values(X_test[:50])
                 
                 if isinstance(shap_values, list):
-                    shap_values = shap_values[1]  # For binary classification
+                    # For classification, taking the mean across all classes or just the positive class
+                    # Simplifying to take mean of absolute values across all classes if multiple
+                    shap_values = np.mean([np.abs(sv) for sv in shap_values], axis=0)
+                
+                # Ensure we have (samples, features) shape
+                if len(shap_values.shape) > 2:
+                    # If (samples, features, outputs), take mean across outputs
+                    shap_values = np.mean(np.abs(shap_values), axis=-1)
                 
                 mean_abs_shap = np.abs(shap_values).mean(axis=0)
+                
+                # Ensure mean_abs_shap is 1D
+                if len(mean_abs_shap.shape) > 1:
+                     mean_abs_shap = np.mean(mean_abs_shap, axis=-1)
+
                 explanations['shap_summary'] = [
                     {"feature": f"feature_{i}", "mean_shap": float(val)}
                     for i, val in enumerate(mean_abs_shap)
@@ -441,13 +481,11 @@ class EnhancedTrainingAgent(BaseAgent):
             return {k: self._convert_to_native(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [self._convert_to_native(v) for v in obj]
-        elif isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
+        elif isinstance(obj, np.integer):
             return int(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
+        elif isinstance(obj, np.floating):
             return float(obj)
-        elif isinstance(obj, (np.bool_, bool)):
+        elif isinstance(obj, (bool, np.bool_)):
             return bool(obj)
         elif isinstance(obj, np.ndarray):
             return self._convert_to_native(obj.tolist())

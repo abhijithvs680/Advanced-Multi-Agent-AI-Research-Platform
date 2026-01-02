@@ -43,12 +43,14 @@ cd multi-agent-research-platform
 cp .env.example .env
 ```
 
-### 2. Configure API Keys (Optional)
+### 2. Configure API Keys
+
+**Crucial Step**: You must configure your API keys in the `.env` file for the agents to function correctly.
 
 ```bash
 # Edit .env file with your API keys
-OPENAI_API_KEY=sk-xxx          # For LLM features
-ANTHROPIC_API_KEY=sk-ant-xxx    # Alternative LLM
+OPENAI_API_KEY=sk-xxx          # Required for Research & Data agents
+ANTHROPIC_API_KEY=sk-ant-xxx    # Optional alternative
 ```
 
 ### 3. Launch Services
@@ -80,23 +82,23 @@ docker-compose exec app alembic upgrade head
 
 | Agent | Capabilities |
 |-------|-------------|
-| **Research** | Literature search, hypothesis generation, methodology design |
-| **Data** | Multi-source collection, feature engineering, quality reports |
-| **Training** | Hyperparameter optimization, model explanations, MLflow tracking |
-| **Evaluation** | Statistical tests, ablation studies, publication figures |
+| **Research** | Literature search (Semantic Scholar), hypothesis generation, risk assessment |
+| **Data** | Multi-source collection, automated cleaning, feature engineering, quality scoring |
+| **Training** | Parallel multi-model training, **Optuna** hyperparameter tuning, **SHAP** explainability |
+| **Evaluation** | Statistical significance testing (T-test, Wilcoxon), ablation studies, acceptance ranking |
 
 ### 🧠 AI Capabilities
 
-- **LLM Integration** - OpenAI GPT-4 & Anthropic Claude
-- **Paper Search** - Semantic Scholar & arXiv APIs
-- **Knowledge Graph** - Persistent artifact storage with lineage
-- **Real-time Updates** - WebSocket live progress
+- **LLM Integration** - OpenAI GPT-4 & Anthropic Claude for cognitive tasks
+- **Paper Search** - Real-time access to academic databases
+- **Knowledge Graph** - Persistent storage of research artifacts and lineage
+- **Real-time Updates** - WebSocket streaming for live progress monitoring
 
 ### 📦 Export Formats
 
-- 📄 PDF Reports
+- 📄 PDF Reports (Publication ready)
 - 📝 LaTeX Documents
-- 📓 Jupyter Notebooks
+- 📓 Jupyter Notebooks (Reproducible research)
 - 📋 Markdown Summaries
 
 ---

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -24,7 +24,7 @@ import {
 import { api } from '../api/client';
 import type { Job, WorkflowExecution } from '../types';
 import StatusBadge from '../components/StatusBadge';
-import ResultsVisualization from '../components/ResultsVisualization';
+import WorkflowDataTabs from '../components/WorkflowDataTabs';
 import { useJobUpdates } from '../hooks/useWebSocket';
 import './JobDetails.css';
 
@@ -55,6 +55,7 @@ export default function JobDetails({ addToast }: JobDetailsProps) {
         currentState,
         progress,
         message,
+        stageResults: wsStageResults,
         connected: isConnected
     } = useJobUpdates(jobId || '');
 
@@ -141,11 +142,32 @@ export default function JobDetails({ addToast }: JobDetailsProps) {
         }
     };
 
+    // Initial fetch on mount
     useEffect(() => {
         fetchJobDetails();
-        const interval = setInterval(fetchJobDetails, 5000);
-        return () => clearInterval(interval);
     }, [jobId]);
+
+    // Merge stage results from job (persisted) and websocket (live)
+    // prioritized order: raw results < transformed UI results < live updates
+    const mergedStageResults = {
+        ...(job?.result?.final_results || {}),
+        ...(job?.state_results || {}),
+        ...wsStageResults
+    };
+
+    // Use live values from WebSocket if available, otherwise fallback to API data
+    const activeState = currentState || job?.current_state || 'INITIALIZED';
+    const activeStatus = status || job?.status || 'PENDING';
+    const activeProgress = progress !== undefined ? progress : (job?.progress || 0);
+
+    // Re-fetch details when significant state changes occur via WebSocket
+    // This replaces constant polling with event-driven updates
+    // Re-fetch details when significant state changes occur via WebSocket
+    useEffect(() => {
+        if (currentState || status === 'COMPLETED' || status === 'FAILED') {
+            fetchJobDetails();
+        }
+    }, [currentState, status]);
 
     const handleCancel = async () => {
         if (!job) return;
@@ -353,13 +375,15 @@ export default function JobDetails({ addToast }: JobDetailsProps) {
                     </div>
                 </div>
 
-                {/* Results Visualization */}
-                {job.result && (
-                    <div className="card result-card full-width">
-                        <h2 className="card-title">Results & Metrics</h2>
-                        <ResultsVisualization result={job.result} />
-                    </div>
-                )}
+                <div className="card result-card full-width">
+                    <h2 className="card-title">Live Execution Dashboard</h2>
+                    <WorkflowDataTabs
+                        jobId={job.id}
+                        stageResults={mergedStageResults}
+                        currentState={activeState}
+                        progress={activeProgress}
+                    />
+                </div>
 
                 {/* Error Card */}
                 {job.error_message && (

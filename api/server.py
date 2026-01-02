@@ -9,6 +9,8 @@ import time
 from shared.logger import get_logger
 from shared.database import get_db_manager
 from shared.queue import get_job_queue
+import os
+from workers.workflow_worker import WorkflowWorker
 
 logger = get_logger(__name__)
 
@@ -25,6 +27,11 @@ async def lifespan(app: FastAPI):
     db_manager = get_db_manager()
     db_manager.create_tables()
     logger.info("database_initialized")
+
+    # Set main event loop for WebSockets
+    import asyncio
+    from api.routes.websocket import set_main_loop
+    set_main_loop(asyncio.get_running_loop())
     
     # Initialize job queue
     job_queue = get_job_queue()
@@ -32,11 +39,38 @@ async def lifespan(app: FastAPI):
         logger.info("job_queue_initialized")
     else:
         logger.error("job_queue_initialization_failed")
+
+    # Start Workflow Workers in background
+    num_workers = int(os.getenv("NUM_WORKERS", "2"))
+    config_path = os.getenv("CONFIG_PATH", "/app/config/config.yaml")
+    
+    logger.info("starting_workflow_workers", count=num_workers)
+    app.state.workers = [
+        WorkflowWorker(worker_id=i, config_path=config_path)
+        for i in range(num_workers)
+    ]
+    
+    # Start worker run loops as background tasks
+    app.state.worker_tasks = [
+        asyncio.create_task(worker.run())
+        for worker in app.state.workers
+    ]
     
     yield
     
     # Shutdown
     logger.info("api_server_shutting_down")
+    
+    # Stop workers
+    if hasattr(app.state, 'workers'):
+        for worker in app.state.workers:
+            worker.stop()
+    
+    if hasattr(app.state, 'worker_tasks'):
+        for task in app.state.worker_tasks:
+            task.cancel()
+            
+    logger.info("workers_stopped")
 
 
 def create_app() -> FastAPI:

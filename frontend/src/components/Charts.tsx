@@ -3,7 +3,7 @@ import './Charts.css';
 
 interface DataPoint {
     label: string;
-    value: number;
+    value: number | null | undefined;
     color?: string;
 }
 
@@ -15,7 +15,7 @@ interface BarChartProps {
 }
 
 export function BarChart({ data, title, height = 200, showValues = true }: BarChartProps) {
-    const maxValue = useMemo(() => Math.max(...data.map(d => d.value), 1), [data]);
+    const maxValue = useMemo(() => Math.max(...data.map(d => d.value || 0), 1), [data]);
 
     const defaultColors = [
         'var(--accent-primary)',
@@ -31,7 +31,8 @@ export function BarChart({ data, title, height = 200, showValues = true }: BarCh
             {title && <h3 className="chart-title">{title}</h3>}
             <div className="bar-chart-container" style={{ height }}>
                 {data.map((item, index) => {
-                    const percentage = (item.value / maxValue) * 100;
+                    const val = item.value || 0;
+                    const percentage = (val / maxValue) * 100;
                     const color = item.color || defaultColors[index % defaultColors.length];
 
                     return (
@@ -47,9 +48,11 @@ export function BarChart({ data, title, height = 200, showValues = true }: BarCh
                                 >
                                     {showValues && (
                                         <span className="bar-value">
-                                            {typeof item.value === 'number' && item.value < 1
-                                                ? (item.value * 100).toFixed(1) + '%'
-                                                : item.value.toFixed(2)
+                                            {typeof item.value === 'number'
+                                                ? (item.value < 1
+                                                    ? (item.value * 100).toFixed(1) + '%'
+                                                    : item.value.toFixed(2))
+                                                : 'N/A'
                                             }
                                         </span>
                                     )}
@@ -70,7 +73,7 @@ interface DonutChartProps {
 }
 
 export function DonutChart({ data, title, size = 160 }: DonutChartProps) {
-    const total = useMemo(() => data.reduce((sum, d) => sum + d.value, 0), [data]);
+    const total = useMemo(() => data.reduce((sum, d) => sum + (d.value || 0), 0), [data]);
 
     const defaultColors = [
         '#3b82f6',
@@ -84,7 +87,8 @@ export function DonutChart({ data, title, size = 160 }: DonutChartProps) {
     // Calculate segments
     let cumulativePercent = 0;
     const segments = data.map((item, index) => {
-        const percent = total > 0 ? (item.value / total) * 100 : 0;
+        const val = item.value || 0;
+        const percent = total > 0 ? (val / total) * 100 : 0;
         const startPercent = cumulativePercent;
         cumulativePercent += percent;
 
@@ -146,7 +150,7 @@ interface MetricCardProps {
 export function MetricCard({ label, value, change, icon, color }: MetricCardProps) {
     const formattedValue = typeof value === 'number'
         ? (value < 1 ? (value * 100).toFixed(1) + '%' : value.toFixed(2))
-        : value;
+        : (value ?? 'N/A');
 
     return (
         <div className="metric-card" style={{ borderTopColor: color }}>
@@ -172,14 +176,18 @@ interface LineSparkProps {
 }
 
 export function LineSpark({ data, color = 'var(--accent-primary)', height = 40, width = 120 }: LineSparkProps) {
-    if (data.length < 2) return null;
+    if (!data || data.length < 2) return null;
 
-    const min = Math.min(...data);
-    const max = Math.max(...data);
+    // Filter out invalid values and handle nulls
+    const validData = data.map(v => v ?? 0).filter(v => typeof v === 'number' && !isNaN(v));
+    if (validData.length < 2) return null;
+
+    const min = Math.min(...validData);
+    const max = Math.max(...validData);
     const range = max - min || 1;
 
-    const points = data.map((value, index) => {
-        const x = (index / (data.length - 1)) * width;
+    const points = validData.map((value, index) => {
+        const x = (index / (validData.length - 1)) * width;
         const y = height - ((value - min) / range) * height;
         return `${x},${y}`;
     }).join(' ');
@@ -199,7 +207,7 @@ export function LineSpark({ data, color = 'var(--accent-primary)', height = 40, 
 }
 
 interface ProgressRingProps {
-    value: number;
+    value: number | null | undefined;
     max?: number;
     size?: number;
     strokeWidth?: number;
@@ -215,9 +223,10 @@ export function ProgressRing({
     color = 'var(--accent-primary)',
     label
 }: ProgressRingProps) {
+    const safeValue = value ?? 0;
     const radius = (size - strokeWidth) / 2;
     const circumference = radius * 2 * Math.PI;
-    const percent = Math.min(value / max, 1);
+    const percent = Math.min(safeValue / max, 1);
     const offset = circumference - (percent * circumference);
 
     return (

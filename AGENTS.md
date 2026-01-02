@@ -1,803 +1,131 @@
-# TASK: Build Multi-Agent AI Research Assistant
+# 🤖 Intelligent Agents Reference
 
-## Instructions for AI Coding Agent
-
-You are tasked with building a **Multi-Agent AI Research Assistant** system. This document provides complete specifications, requirements, and implementation instructions. Follow the tasks sequentially and implement all components as specified.
+This document provides technical documentation for the autonomous agents powering the **Multi-Agent AI Research Platform**.
 
 ---
 
-## PROJECT OVERVIEW
+## 🏗️ System Architecture
 
-**Objective:** Build a production-ready multi-agent AI system that autonomously manages ML research workflows including literature review, data collection, model training, and evaluation.
+The system utilizes a multi-agent architecture where specialized agents execute tasks sequentially, coordinated by a central orchestration layer.
 
-**Key Requirements:**
-- 4 specialized autonomous agents (Research, Data, Training, Evaluation)
-- Decision Engine for orchestration and feedback loops
-- Production-quality code with tests, logging, and error handling
-- Containerized deployment with Docker
-- Complete documentation
-
----
-
-## SYSTEM ARCHITECTURE
-
-### Agent Communication Flow
-```
-Research Agent → Data Agent → Training Agent → Evaluation Agent
-     ↑                                              ↓
-     └────────────── Feedback Loop ────────────────┘
-                          ↓
-                  Decision Engine
-                 (Orchestrator)
-```
-
-### Core Components
-1. **Research Agent** - Literature search and strategy planning
-2. **Data Agent** - Data collection and preprocessing
-3. **Training Agent** - Model training and hyperparameter optimization
-4. **Evaluation Agent** - Model evaluation and ranking
-5. **Decision Engine** - Workflow orchestration and feedback management
-
----
-
-## IMPLEMENTATION TASKS
-
-### PHASE 1: Project Setup and Foundation
-
-#### Task 1.1: Initialize Project Structure
-Create the following directory structure:
-
-```
-multi-agent-ai-research-assistant/
-├── agents/
-│   ├── __init__.py
-│   ├── base_agent.py
-│   ├── research_agent/
-│   │   ├── __init__.py
-│   │   ├── agent.py
-│   │   └── tests/
-│   │       └── test_research_agent.py
-│   ├── data_agent/
-│   │   ├── __init__.py
-│   │   ├── agent.py
-│   │   └── tests/
-│   │       └── test_data_agent.py
-│   ├── training_agent/
-│   │   ├── __init__.py
-│   │   ├── agent.py
-│   │   └── tests/
-│   │       └── test_training_agent.py
-│   └── evaluation_agent/
-│       ├── __init__.py
-│       ├── agent.py
-│       └── tests/
-│           └── test_evaluation_agent.py
-├── orchestration/
-│   ├── __init__.py
-│   ├── decision_engine.py
-│   ├── state_manager.py
-│   ├── communication.py
-│   ├── feedback_handler.py
-│   └── tests/
-│       ├── test_decision_engine.py
-│       └── test_state_manager.py
-├── shared/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── logger.py
-│   ├── types.py
-│   └── utils.py
-├── experiments/
-│   └── examples/
-│       └── drug_discovery_example.py
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── results/
-├── tests/
-│   ├── integration/
-│   └── e2e/
-├── docs/
-│   ├── architecture.md
-│   ├── api_reference.md
-│   └── user_guide.md
-├── docker/
-│   ├── Dockerfile
-│   └── docker-compose.yml
-├── scripts/
-│   ├── setup.sh
-│   └── run_experiment.py
-├── config/
-│   └── config.yaml
-├── requirements.txt
-├── setup.py
-├── README.md
-├── .gitignore
-└── pytest.ini
-```
-
-#### Task 1.2: Create requirements.txt
-Include these dependencies:
-```
-# Core
-python>=3.10
-
-# ML Frameworks
-torch>=2.0.0
-scikit-learn>=1.3.0
-xgboost>=2.0.0
-numpy>=1.24.0
-pandas>=2.0.0
-
-# Agent Orchestration
-langchain>=0.1.0
-openai>=1.0.0
-anthropic>=0.18.0
-
-# Distributed Computing
-ray>=2.9.0
-celery>=5.3.0
-
-# Experiment Tracking
-mlflow>=2.10.0
-wandb>=0.16.0
-
-# Data Storage
-psycopg2-binary>=2.9.0
-pymongo>=4.6.0
-boto3>=1.34.0
-
-# API Framework
-fastapi>=0.109.0
-uvicorn>=0.27.0
-pydantic>=2.6.0
-
-# Utilities
-python-dotenv>=1.0.0
-pyyaml>=6.0
-structlog>=24.1.0
-tenacity>=8.2.0
-
-# Testing
-pytest>=8.0.0
-pytest-asyncio>=0.23.0
-pytest-cov>=4.1.0
-pytest-mock>=3.12.0
-
-# Visualization
-plotly>=5.18.0
-```
-
-#### Task 1.3: Create Base Configuration System
-File: `shared/config.py`
-```python
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
-import yaml
-from pathlib import Path
-
-@dataclass
-class AgentConfig:
-    """Configuration for individual agents"""
-    name: str
-    type: str
-    max_retries: int = 3
-    timeout: int = 300
-    llm_model: str = "gpt-4"
-    temperature: float = 0.7
-
-@dataclass
-class SystemConfig:
-    """Main system configuration"""
-    agents: Dict[str, AgentConfig]
-    orchestration: Dict[str, Any]
-    storage: Dict[str, Any]
-    logging: Dict[str, Any]
+```mermaid
+graph LR
+    User[User Input] --> O[Orchestrator]
+    O --> RA[Research Agent]
+    RA --> DA[Data Agent]
+    DA --> TA[Training Agent]
+    TA --> EA[Evaluation Agent]
+    EA --> KG[Knowledge Graph]
     
-    @classmethod
-    def load_from_yaml(cls, config_path: str) -> 'SystemConfig':
-        """Load configuration from YAML file"""
-        with open(config_path, 'r') as f:
-            config_dict = yaml.safe_load(f)
-        
-        # Parse agent configs
-        agents = {
-            name: AgentConfig(**agent_config)
-            for name, agent_config in config_dict.get('agents', {}).items()
-        }
-        
-        return cls(
-            agents=agents,
-            orchestration=config_dict.get('orchestration', {}),
-            storage=config_dict.get('storage', {}),
-            logging=config_dict.get('logging', {})
-        )
-```
-
-#### Task 1.4: Create Logging System
-File: `shared/logger.py`
-```python
-import structlog
-import logging
-from typing import Any, Dict
-
-def setup_logging(log_level: str = "INFO") -> None:
-    """Configure structured logging"""
-    logging.basicConfig(
-        format="%(message)s",
-        level=getattr(logging, log_level.upper()),
-    )
-    
-    structlog.configure(
-        processors=[
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.stdlib.add_log_level,
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.JSONRenderer()
-        ],
-        context_class=dict,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
-
-def get_logger(name: str) -> structlog.BoundLogger:
-    """Get a configured logger instance"""
-    return structlog.get_logger(name)
-```
-
-#### Task 1.5: Create Shared Types
-File: `shared/types.py`
-```python
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-from enum import Enum
-from datetime import datetime
-
-class MessageType(Enum):
-    """Types of messages agents can send"""
-    TASK_REQUEST = "task_request"
-    TASK_RESPONSE = "task_response"
-    FEEDBACK = "feedback"
-    ERROR = "error"
-    STATUS_UPDATE = "status_update"
-
-class WorkflowState(Enum):
-    """States in the research workflow"""
-    INITIALIZED = "initialized"
-    RESEARCHING = "researching"
-    COLLECTING_DATA = "collecting_data"
-    TRAINING = "training"
-    EVALUATING = "evaluating"
-    COMPLETED = "completed"
-    FAILED = "failed"
-
-class FeedbackType(Enum):
-    """Types of feedback between agents"""
-    REWORK = "rework"
-    APPROVAL = "approval"
-    ESCALATION = "escalation"
-    CLARIFICATION = "clarification"
-
-@dataclass
-class Message:
-    """Inter-agent communication message"""
-    sender: str
-    receiver: str
-    message_type: MessageType
-    payload: Dict[str, Any]
-    timestamp: datetime
-    correlation_id: str
-    metadata: Optional[Dict[str, Any]] = None
-
-@dataclass
-class TaskResult:
-    """Result from an agent task"""
-    agent_name: str
-    task_id: str
-    status: str  # "success", "failure", "partial"
-    data: Any
-    metrics: Dict[str, float]
-    errors: Optional[List[str]] = None
-    timestamp: datetime = None
-    
-    def __post_init__(self):
-        if self.timestamp is None:
-            self.timestamp = datetime.now()
-
-@dataclass
-class Feedback:
-    """Feedback from one agent to another"""
-    source_agent: str
-    target_agent: str
-    feedback_type: FeedbackType
-    message: str
-    data: Optional[Dict[str, Any]] = None
-    suggested_action: Optional[str] = None
-    timestamp: datetime = None
-    
-    def __post_init__(self):
-        if self.timestamp is None:
-            self.timestamp = datetime.now()
+    subgraph Feedback Loops
+    EA -.-> |Rework| TA
+    TA -.-> |Rework| DA
+    end
 ```
 
 ---
 
-### PHASE 2: Core Agent Implementation
+## 🔍 Research Agent
 
-#### Task 2.1: Implement Base Agent Class
-File: `agents/base_agent.py`
-```python
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
-import uuid
-from datetime import datetime
-from shared.types import Message, TaskResult, MessageType
-from shared.logger import get_logger
-from tenacity import retry, stop_after_attempt, wait_exponential
+**Role**: Principal Investigator & Literature Reviewer
+**Implementation**: `agents.research_agent.agent.ResearchAgent`
 
-class BaseAgent(ABC):
-    """Abstract base class for all agents"""
-    
-    def __init__(self, name: str, config: Dict[str, Any]):
-        self.name = name
-        self.config = config
-        self.logger = get_logger(self.name)
-        self.state = {}
-        self.message_queue = []
-        
-    @abstractmethod
-    async def process_task(self, task: Dict[str, Any]) -> TaskResult:
-        """Process a task and return result"""
-        pass
-    
-    @abstractmethod
-    async def validate_input(self, input_data: Dict[str, Any]) -> bool:
-        """Validate input data before processing"""
-        pass
-    
-    async def send_message(self, receiver: str, message_type: MessageType, 
-                          payload: Dict[str, Any]) -> None:
-        """Send message to another agent"""
-        message = Message(
-            sender=self.name,
-            receiver=receiver,
-            message_type=message_type,
-            payload=payload,
-            timestamp=datetime.now(),
-            correlation_id=str(uuid.uuid4())
-        )
-        self.logger.info("message_sent", receiver=receiver, type=message_type.value)
-        # Communication bus will handle delivery
-        await self._deliver_message(message)
-    
-    async def receive_message(self) -> Optional[Message]:
-        """Receive message from queue"""
-        if self.message_queue:
-            return self.message_queue.pop(0)
-        return None
-    
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
-    async def execute_with_retry(self, func, *args, **kwargs):
-        """Execute function with retry logic"""
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            self.logger.error("execution_failed", error=str(e), func=func.__name__)
-            raise
-    
-    def get_status(self) -> Dict[str, Any]:
-        """Get current agent status"""
-        return {
-            "name": self.name,
-            "state": self.state,
-            "queue_size": len(self.message_queue),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    async def _deliver_message(self, message: Message) -> None:
-        """Internal method to deliver message via communication bus"""
-        # This will be implemented by the communication system
-        pass
-```
+The Research Agent is responsible for understanding the user's research topic, surveying existing literature, and formulating scientific hypotheses.
 
-#### Task 2.2: Implement Research Agent
-File: `agents/research_agent/agent.py`
-```python
-from agents.base_agent import BaseAgent
-from shared.types import TaskResult
-from typing import Any, Dict, List
-import asyncio
+### Capabilities
+- **Literature Search**: Interfaces with Semantic Scholar and arXiv APIs to find relevant academic papers.
+- **Context Analysis**: Uses LLMs (GPT-4/Claude) to summarize abstracts and extract key methodologies.
+- **Hypothesis Generation**: Synthesizes findings to propose novel research hypotheses with confidence scores.
+- **Risk Assessment**: Identifies potential pitfalls in the proposed research direction.
 
-class ResearchAgent(BaseAgent):
-    """Agent responsible for literature review and research strategy"""
-    
-    def __init__(self, name: str, config: Dict[str, Any]):
-        super().__init__(name, config)
-        self.llm_model = config.get('llm_model', 'gpt-4')
-        
-    async def process_task(self, task: Dict[str, Any]) -> TaskResult:
-        """Process research task"""
-        self.logger.info("processing_research_task", task_id=task.get('id'))
-        
-        query = task.get('query')
-        domain = task.get('domain', 'general')
-        
-        # Validate input
-        if not await self.validate_input(task):
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=["Invalid input data"]
-            )
-        
-        try:
-            # Search literature
-            papers = await self.search_literature(query)
-            
-            # Analyze papers
-            analysis = await self.analyze_papers(papers)
-            
-            # Propose strategy
-            strategy = await self.propose_strategy(analysis, domain)
-            
-            # Assess risks
-            risks = await self.assess_risks(strategy)
-            
-            result_data = {
-                "papers": papers,
-                "analysis": analysis,
-                "strategy": strategy,
-                "risks": risks,
-                "data_requirements": self._extract_data_requirements(strategy)
-            }
-            
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="success",
-                data=result_data,
-                metrics={
-                    "papers_found": len(papers),
-                    "confidence_score": analysis.get('confidence', 0.0)
-                }
-            )
-            
-        except Exception as e:
-            self.logger.error("research_task_failed", error=str(e))
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=[str(e)]
-            )
-    
-    async def validate_input(self, input_data: Dict[str, Any]) -> bool:
-        """Validate research task input"""
-        required_fields = ['query', 'id']
-        return all(field in input_data for field in required_fields)
-    
-    async def search_literature(self, query: str) -> List[Dict[str, Any]]:
-        """Search scientific literature"""
-        self.logger.info("searching_literature", query=query)
-        
-        # TODO: Integrate with actual paper search API (Semantic Scholar, arXiv, etc.)
-        # For now, return mock data
-        await asyncio.sleep(0.5)  # Simulate API call
-        
-        return [
-            {
-                "title": f"Paper about {query}",
-                "authors": ["Author 1", "Author 2"],
-                "abstract": f"Abstract discussing {query}...",
-                "year": 2024,
-                "citations": 42
-            }
-        ]
-    
-    async def analyze_papers(self, papers: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze collected papers"""
-        self.logger.info("analyzing_papers", count=len(papers))
-        
-        # TODO: Use LLM to analyze papers
-        await asyncio.sleep(0.5)
-        
-        return {
-            "summary": "Key findings from literature review",
-            "key_methodologies": ["Method 1", "Method 2"],
-            "gaps": ["Gap 1", "Gap 2"],
-            "confidence": 0.85
-        }
-    
-    async def propose_strategy(self, analysis: Dict[str, Any], 
-                              domain: str) -> Dict[str, Any]:
-        """Propose research strategy based on analysis"""
-        self.logger.info("proposing_strategy", domain=domain)
-        
-        return {
-            "approach": "Supervised learning with ensemble methods",
-            "model_types": ["Random Forest", "XGBoost", "Neural Network"],
-            "features_needed": ["feature_1", "feature_2", "feature_3"],
-            "evaluation_metrics": ["accuracy", "f1_score", "auc_roc"]
-        }
-    
-    async def assess_risks(self, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Assess risks in proposed strategy"""
-        self.logger.info("assessing_risks")
-        
-        return [
-            {
-                "risk": "Data quality issues",
-                "severity": "medium",
-                "mitigation": "Implement robust data validation"
-            },
-            {
-                "risk": "Model overfitting",
-                "severity": "high",
-                "mitigation": "Use cross-validation and regularization"
-            }
-        ]
-    
-    def _extract_data_requirements(self, strategy: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract data requirements from strategy"""
-        return {
-            "features": strategy.get('features_needed', []),
-            "min_samples": 1000,
-            "data_sources": ["source_1", "source_2"],
-            "quality_threshold": 0.9
-        }
-```
+### Key Outputs
+- `summary`: Comprehensive literature review.
+- `key_findings`: Bulleted list of proven facts from papers.
+- `hypotheses`: Structured scientific hypotheses with rationales.
+- `data_requirements`: Specifications for the Data Agent.
 
-#### Task 2.3: Implement Data Agent
-File: `agents/data_agent/agent.py`
-```python
-from agents.base_agent import BaseAgent
-from shared.types import TaskResult
-from typing import Any, Dict
-import pandas as pd
-import numpy as np
+---
 
-class DataAgent(BaseAgent):
-    """Agent responsible for data collection and preprocessing"""
-    
-    def __init__(self, name: str, config: Dict[str, Any]):
-        super().__init__(name, config)
-        self.data_cache = {}
-        
-    async def process_task(self, task: Dict[str, Any]) -> TaskResult:
-        """Process data collection and preparation task"""
-        self.logger.info("processing_data_task", task_id=task.get('id'))
-        
-        if not await self.validate_input(task):
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=["Invalid input data"]
-            )
-        
-        try:
-            requirements = task.get('data_requirements', {})
-            
-            # Collect data
-            raw_data = await self.collect_data(requirements)
-            
-            # Clean data
-            clean_data = await self.clean_data(raw_data)
-            
-            # Engineer features
-            features = await self.engineer_features(clean_data, requirements)
-            
-            # Validate quality
-            quality_report = await self.validate_quality(features)
-            
-            if quality_report['quality_score'] < requirements.get('quality_threshold', 0.8):
-                return TaskResult(
-                    agent_name=self.name,
-                    task_id=task.get('id'),
-                    status="partial",
-                    data={
-                        "features": features,
-                        "quality_report": quality_report
-                    },
-                    metrics=quality_report,
-                    errors=["Data quality below threshold"]
-                )
-            
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="success",
-                data={
-                    "features": features,
-                    "quality_report": quality_report,
-                    "preprocessing_pipeline": self._get_pipeline_config()
-                },
-                metrics={
-                    "samples": len(features),
-                    "features": len(features.columns) if hasattr(features, 'columns') else 0,
-                    "quality_score": quality_report['quality_score']
-                }
-            )
-            
-        except Exception as e:
-            self.logger.error("data_task_failed", error=str(e))
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=[str(e)]
-            )
-    
-    async def validate_input(self, input_data: Dict[str, Any]) -> bool:
-        """Validate data task input"""
-        return 'data_requirements' in input_data and 'id' in input_data
-    
-    async def collect_data(self, requirements: Dict[str, Any]) -> pd.DataFrame:
-        """Collect data from specified sources"""
-        self.logger.info("collecting_data", sources=requirements.get('data_sources', []))
-        
-        # TODO: Implement actual data collection from various sources
-        # For now, generate mock data
-        n_samples = requirements.get('min_samples', 1000)
-        n_features = len(requirements.get('features', ['f1', 'f2', 'f3']))
-        
-        data = pd.DataFrame(
-            np.random.randn(n_samples, n_features),
-            columns=[f'feature_{i}' for i in range(n_features)]
-        )
-        
-        return data
-    
-    async def clean_data(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Clean and preprocess data"""
-        self.logger.info("cleaning_data", shape=data.shape)
-        
-        # Remove duplicates
-        data = data.drop_duplicates()
-        
-        # Handle missing values
-        data = data.fillna(data.mean())
-        
-        # Remove outliers (simple z-score method)
-        z_scores = np.abs((data - data.mean()) / data.std())
-        data = data[(z_scores < 3).all(axis=1)]
-        
-        return data
-    
-    async def engineer_features(self, data: pd.DataFrame, 
-                                requirements: Dict[str, Any]) -> pd.DataFrame:
-        """Engineer features based on requirements"""
-        self.logger.info("engineering_features")
-        
-        # TODO: Implement sophisticated feature engineering
-        # For now, just add some basic derived features
-        
-        # Normalize features
-        normalized = (data - data.mean()) / data.std()
-        
-        return normalized
-    
-    async def validate_quality(self, data: pd.DataFrame) -> Dict[str, Any]:
-        """Validate data quality"""
-        self.logger.info("validating_quality")
-        
-        missing_ratio = data.isnull().sum().sum() / (data.shape[0] * data.shape[1])
-        duplicate_ratio = data.duplicated().sum() / len(data)
-        
-        quality_score = 1.0 - (missing_ratio + duplicate_ratio) / 2
-        
-        return {
-            "quality_score": float(quality_score),
-            "missing_ratio": float(missing_ratio),
-            "duplicate_ratio": float(duplicate_ratio),
-            "n_samples": len(data),
-            "n_features": len(data.columns)
-        }
-    
-    def _get_pipeline_config(self) -> Dict[str, Any]:
-        """Get preprocessing pipeline configuration"""
-        return {
-            "steps": [
-                "remove_duplicates",
-                "fill_missing",
-                "remove_outliers",
-                "normalize"
-            ]
-        }
-```
+## 📊 Data Agent
 
-#### Task 2.4: Implement Training Agent
-File: `agents/training_agent/agent.py`
-```python
-from agents.base_agent import BaseAgent
-from shared.types import TaskResult
-from typing import Any, Dict, List
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score
-import mlflow
+**Role**: Data Scientist & Engineer
+**Implementation**: `agents.data_agent.agent.DataAgent`
 
-class TrainingAgent(BaseAgent):
-    """Agent responsible for model training and optimization"""
-    
-    def __init__(self, name: str, config: Dict[str, Any]):
-        super().__init__(name, config)
-        self.experiment_tracker = None
-        
-    async def process_task(self, task: Dict[str, Any]) -> TaskResult:
-        """Process model training task"""
-        self.logger.info("processing_training_task", task_id=task.get('id'))
-        
-        if not await self.validate_input(task):
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=["Invalid input data"]
-            )
-        
-        try:
-            features = task.get('features')
-            strategy = task.get('strategy', {})
-            
-            # Setup experiment
-            experiment = await self.setup_experiment(task.get('id'), strategy)
-            
-            # Train models
-            trained_models = await self.train_models(features, strategy)
-            
-            # Optimize hyperparameters
-            optimized_models = await self.optimize_hyperparameters(trained_models, features)
-            
-            # Track metrics
-            metrics = await self.track_metrics(optimized_models)
-            
-            # Select best model
-            best_model = max(optimized_models, key=lambda m: m['score'])
-            
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="success",
-                data={
-                    "best_model": best_model,
-                    "all_models": optimized_models,
-                    "experiment_id": experiment['id']
-                },
-                metrics={
-                    "best_score": best_model['score'],
-                    "models_trained": len(trained_models),
-                    "training_time": sum(m.get('training_time', 0) for m in optimized_models)
-                }
-            )
-            
-        except Exception as e:
-            self.logger.error("training_task_failed", error=str(e))
-            return TaskResult(
-                agent_name=self.name,
-                task_id=task.get('id'),
-                status="failure",
-                data=None,
-                metrics={},
-                errors=[str(e)]
-            )
-    
-    async def validate_input(self, input_data: Dict[str, Any]) -> bool:
-        """Validate training task input"""
-        return 'features' in input_data and 'id' in input_data
-    
+The Data Agent handles the acquisition, cleaning, and preparation of datasets based on the requirements defined by the Research Agent.
+
+### Capabilities
+- **Data Collection**: Fetches data from defined sources (mocked for demo, extensible for APIs).
+- **Automated Cleaning**: Handles missing values (imputation), removes duplicates, and filters outliers.
+- **Feature Engineering**: Normalizes numerical data and encodes categorical variables.
+- **Quality Assurance**: Generates a quality report with metrics like missing ratio and correlation analysis.
+
+### Key Outputs
+- `features`: Processed DataFrame ready for training.
+- `quality_report`: Metrics on data health (0.0 - 1.0 score).
+- `summary`: Metadata about the dataset (rows, columns, targets).
+
+---
+
+## 🎓 Training Agent
+
+**Role**: Machine Learning Engineer
+**Implementation**: `agents.training_agent.agent.EnhancedTrainingAgent`
+
+The Training Agent builds and optimizes machine learning models. It supports multiple algorithms and focuses on explainability.
+
+### Capabilities
+- **Multi-Model Training**: Parallel training of:
+    - Random Forest
+    - Gradient Boosting (XGBoost/LightGBM)
+    - Logistic Regression
+    - Neural Networks (MLP)
+- **Hyperparameter Optimization**: Uses **Optuna** to find the best parameters for each model type.
+- **Experiment Tracking**: Logs all runs, metrics, and artifacts to **MLflow**.
+- **Explainability**: Generates **SHAP** (SHapley Additive exPlanations) values to explain model predictions.
+
+### Key Outputs
+- `best_model`: The highest-performing model object.
+- `all_models`: List of all trained models with their metrics.
+- `explanations`: Feature importance rankings and SHAP plots.
+- `metrics`: Accuracy, F1-Score, AUC-ROC, Training Time.
+
+---
+
+## ⚖️ Evaluation Agent
+
+**Role**: Peer Reviewer & Statistician
+**Implementation**: `agents.evaluation_agent.agent.EnhancedEvaluationAgent`
+
+The Evaluation Agent performs rigorous validation of the trained models to ensure scientific validity before final reporting.
+
+### Capabilities
+- **Statistical Significance**: Performs T-tests and Wilcoxon signed-rank tests to compare models.
+- **Ablation Studies**: Simulates the removal of components to measure impact (feature importance).
+- **Ranking**: Generates a final leaderboard of models based on a composite score (Accuracy + Efficiency).
+- **Report Generation**: Synthesizes all findings into the final "Job Result".
+
+### Key Outputs
+- `recommendation`: The final endorsed model.
+- `statistical_analysis`: P-values and confidence intervals.
+- `visualizations`: Data structures for frontend charts (Radar charts, Bar charts).
+- `report`: Draft content for the final downloadable report.
+
+---
+
+## 🔄 Orchestration & Interaction
+
+### Decision Engine
+The `DecisionEngine` coordinates the workflow. It:
+1.  Receives a job request.
+2.  Dispatches a task to the **Research Agent**.
+3.  Upon success, passes the output as context to the **Data Agent**.
+4.  Continues this chain, managing state in the database.
+5.  Handles **WebSocket** updates to the frontend for real-time progress.
+
+### Failure Handling
+- **Retries**: Agents have built-in retry logic (via `tenacity`) for transient failures (e.g., API timeouts).
+- **Fallbacks**: If a complex model fails, the system falls back to simpler baselines.
+- **Human-in-the-loop**: The system is designed to pause for human feedback if confidence is low (configurable).
     async def setup_experiment(self, task_id: str, 
                               strategy: Dict[str, Any]) -> Dict[str, Any]:
         """Setup experiment tracking"""

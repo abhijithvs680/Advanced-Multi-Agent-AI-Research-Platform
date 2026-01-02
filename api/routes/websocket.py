@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 
 from shared.database import get_db_manager
 from shared.models import Job
+from shared.utils import sanitize_for_json
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
@@ -29,6 +30,7 @@ class EventType(str, Enum):
     METRICS_UPDATE = "metrics_update"
     SYSTEM_STATUS = "system_status"
     LOG_MESSAGE = "log_message"
+    STAGE_RESULTS = "stage_results"
 
 
 @dataclass
@@ -44,12 +46,12 @@ class WSEvent:
             self.timestamp = datetime.utcnow().isoformat()
     
     def to_json(self) -> str:
-        return json.dumps({
+        return json.dumps(sanitize_for_json({
             "type": self.event_type.value,
             "data": self.data,
             "timestamp": self.timestamp,
             "job_id": self.job_id
-        })
+        }))
 
 
 class ConnectionManager:
@@ -125,13 +127,24 @@ class ConnectionManager:
         event.job_id = job_id
         
         subscribers = self.job_subscriptions.get(job_id, set())
+        logger.info("ws_broadcast_to_job", job_id=job_id, event_type=event.event_type.value, subscribers=len(subscribers))
+        
+        if not subscribers:
+            # Check if there are any active connections at all
+            logger.debug("ws_no_subscribers_for_job", job_id=job_id, total_active=len(self.active_connections))
+        
         disconnected = set()
         
         for connection in subscribers:
             try:
                 if connection.application_state == WebSocketState.CONNECTED:
-                    await connection.send_text(event.to_json())
-            except Exception:
+                    payload = event.to_json()
+                    await connection.send_text(payload)
+                    logger.debug("ws_event_sent", job_id=job_id, event_type=event.event_type.value)
+                else:
+                    disconnected.add(connection)
+            except Exception as e:
+                logger.error("ws_broadcast_failed", job_id=job_id, error=str(e))
                 disconnected.add(connection)
         
         for conn in disconnected:
@@ -145,6 +158,23 @@ manager = ConnectionManager()
 def get_connection_manager() -> ConnectionManager:
     """Get the global connection manager"""
     return manager
+
+
+# Global event loop reference
+MAIN_LOOP: Optional[asyncio.AbstractEventLoop] = None
+
+
+def set_main_loop(loop: asyncio.AbstractEventLoop):
+    """Set the main application event loop"""
+    global MAIN_LOOP
+    MAIN_LOOP = loop
+
+
+def run_in_main_loop(coro):
+    """Run coroutine in main loop if needed"""
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        return asyncio.run_coroutine_threadsafe(coro, MAIN_LOOP)
+    return coro
 
 
 # ==================== Event Emitters ====================
@@ -167,8 +197,15 @@ async def emit_job_status(
             "message": message
         }
     )
-    await manager.broadcast_to_job(job_id, event)
-    await manager.broadcast(event)  # Also broadcast to all
+    
+    async def _emit():
+        await manager.broadcast_to_job(job_id, event)
+        await manager.broadcast(event)
+        
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        asyncio.run_coroutine_threadsafe(_emit(), MAIN_LOOP)
+    else:
+        await _emit()
 
 
 async def emit_agent_progress(
@@ -189,7 +226,14 @@ async def emit_agent_progress(
             "details": details or {}
         }
     )
-    await manager.broadcast_to_job(job_id, event)
+    
+    async def _emit():
+        await manager.broadcast_to_job(job_id, event)
+
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        asyncio.run_coroutine_threadsafe(_emit(), MAIN_LOOP)
+    else:
+        await _emit()
 
 
 async def emit_metrics_update(metrics: Dict[str, Any]):
@@ -198,7 +242,14 @@ async def emit_metrics_update(metrics: Dict[str, Any]):
         event_type=EventType.METRICS_UPDATE,
         data=metrics
     )
-    await manager.broadcast(event)
+    
+    async def _emit():
+        await manager.broadcast(event)
+
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        asyncio.run_coroutine_threadsafe(_emit(), MAIN_LOOP)
+    else:
+        await _emit()
 
 
 async def emit_log_message(
@@ -217,7 +268,38 @@ async def emit_log_message(
             "agent_name": agent_name
         }
     )
-    await manager.broadcast_to_job(job_id, event)
+    
+    async def _emit():
+        await manager.broadcast_to_job(job_id, event)
+
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        asyncio.run_coroutine_threadsafe(_emit(), MAIN_LOOP)
+    else:
+        await _emit()
+
+
+async def emit_stage_results(
+    job_id: str,
+    stage: str,
+    results: Dict[str, Any]
+):
+    """Emit rich results for a specific workflow stage"""
+    event = WSEvent(
+        event_type=EventType.STAGE_RESULTS,
+        job_id=job_id,
+        data={
+            "stage": stage,
+            "stage_data": results
+        }
+    )
+    
+    async def _emit():
+        await manager.broadcast_to_job(job_id, event)
+
+    if MAIN_LOOP and asyncio.get_event_loop() != MAIN_LOOP:
+        asyncio.run_coroutine_threadsafe(_emit(), MAIN_LOOP)
+    else:
+        await _emit()
 
 
 async def send_initial_job_state(websocket: WebSocket, job_id: str):

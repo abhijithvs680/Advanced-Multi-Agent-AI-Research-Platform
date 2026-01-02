@@ -3,6 +3,10 @@ from typing import Any, Dict, List, Optional
 from enum import Enum
 from datetime import datetime
 
+# Re-export WorkflowState from models to ensure single source of truth
+# This prevents enum type mismatches when interacting with the database
+from shared.models import WorkflowState
+
 
 class MessageType(Enum):
     """Types of messages agents can send"""
@@ -11,17 +15,6 @@ class MessageType(Enum):
     FEEDBACK = "feedback"
     ERROR = "error"
     STATUS_UPDATE = "status_update"
-
-
-class WorkflowState(Enum):
-    """States in the research workflow"""
-    INITIALIZED = "INITIALIZED"
-    RESEARCHING = "RESEARCHING"
-    COLLECTING_DATA = "COLLECTING_DATA"
-    TRAINING = "TRAINING"
-    EVALUATING = "EVALUATING"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
 
 
 class FeedbackType(Enum):

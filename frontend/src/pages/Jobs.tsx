@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Plus,
@@ -20,7 +20,7 @@ interface JobsProps {
     addToast: (message: string, type: 'success' | 'error' | 'warning') => void;
 }
 
-const STATUS_OPTIONS: JobStatus[] = ['pending', 'running', 'completed', 'failed', 'cancelled'];
+const STATUS_OPTIONS: JobStatus[] = ['PENDING', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED'];
 
 export default function Jobs({ addToast }: JobsProps) {
     const [jobs, setJobs] = useState<Job[]>([]);
@@ -222,7 +222,7 @@ export default function Jobs({ addToast }: JobsProps) {
                                             <Link to={`/jobs/${job.id}`} className="btn btn-icon btn-secondary" title="View">
                                                 <Eye size={16} />
                                             </Link>
-                                            {(job.status === 'pending' || job.status === 'running') && (
+                                            {(job.status === 'PENDING' || job.status === 'RUNNING') && (
                                                 <button
                                                     className="btn btn-icon btn-secondary"
                                                     onClick={(e) => handleCancel(job.id, e)}
@@ -231,7 +231,7 @@ export default function Jobs({ addToast }: JobsProps) {
                                                     <XCircle size={16} />
                                                 </button>
                                             )}
-                                            {job.status === 'failed' && (
+                                            {job.status === 'FAILED' && (
                                                 <button
                                                     className="btn btn-icon btn-secondary"
                                                     onClick={(e) => handleRetry(job.id, e)}
@@ -240,7 +240,7 @@ export default function Jobs({ addToast }: JobsProps) {
                                                     <RotateCcw size={16} />
                                                 </button>
                                             )}
-                                            {job.status !== 'running' && (
+                                            {job.status !== 'RUNNING' && (
                                                 <button
                                                     className="btn btn-icon btn-danger"
                                                     onClick={(e) => handleDelete(job.id, e)}

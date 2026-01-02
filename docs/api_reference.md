@@ -1,10 +1,9 @@
 # API Reference
 
-## Base URL
+## Base URLs
 
-```
-http://localhost:8000/api/v1
-```
+- **Core API**: `http://localhost:8000/api/v1`
+- **Health & Metrics**: `http://localhost:8000/`
 
 ## Authentication
 
@@ -13,6 +12,8 @@ Currently open access. Enterprise version supports JWT authentication.
 ---
 
 ## Jobs Endpoints
+
+All job endpoints are prefixed with `/api/v1`.
 
 ### Create Job
 
@@ -164,7 +165,9 @@ GET /jobs/{job_id}/export
 
 ---
 
-## Health Endpoints
+## Health & Metrics Endpoints
+
+These endpoints are available at the root level (no `/api/v1` prefix).
 
 ### Health Check
 

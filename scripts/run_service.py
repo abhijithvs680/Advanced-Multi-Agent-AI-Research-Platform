@@ -95,27 +95,19 @@ class ResearchPlatformService:
         await asyncio.gather(*worker_tasks)
     
     async def run(self):
-        """Main service loop"""
+        """Main service loop (API only, workers started via lifespan)"""
         self.running = True
         
         logger.info("research_platform_service_starting")
         
-        # Initialize database
+        # Initialize database tables
         db_manager = get_db_manager()
         db_manager.create_tables()
         logger.info("database_tables_verified")
         
-        # Start API server in separate thread
-        self.api_server = Thread(target=self.start_api_server, daemon=True)
-        self.api_server.start()
-        logger.info("api_server_thread_started")
-        
-        # Give API server time to start
-        await asyncio.sleep(2)
-        
-        # Start workflow workers
-        logger.info("service_ready")
-        await self.start_workers()
+        # Start API server in main thread
+        # Note: Workers are now started in api.server.lifespan
+        self.start_api_server()
     
     def stop(self):
         """Stop the service"""
@@ -124,17 +116,11 @@ class ResearchPlatformService:
         
         logger.info("service_stopping")
         self.running = False
-        
-        # Stop all workers
-        for worker in self.workers:
-            worker.stop()
-        
-        logger.info("service_stopped")
         sys.exit(0)
 
 
 async def main():
-    """Main entry point"""
+    """Main entry point for production"""
     # Get configuration from environment
     num_workers = int(os.getenv("NUM_WORKERS", "2"))
     api_host = os.getenv("API_HOST", "0.0.0.0")
@@ -160,5 +146,27 @@ async def main():
         sys.exit(1)
 
 
+def dev_main():
+    """Main entry point for development (reload enabled)"""
+    num_workers = int(os.getenv("NUM_WORKERS", "2"))
+    api_host = os.getenv("API_HOST", "0.0.0.0")
+    api_port = int(os.getenv("API_PORT", "8000"))
+    config_path = os.getenv("CONFIG_PATH", "/app/config/config.yaml")
+
+    service = ResearchPlatformService(
+        num_workers=num_workers,
+        api_host=api_host,
+        api_port=api_port,
+        config_path=config_path
+    )
+    
+    # Run API server in main thread (blocking)
+    # Note: Workers are now started in api.server.lifespan
+    service.start_api_server()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    if os.getenv("RELOAD_ENABLED", "false").lower() == "true":
+        dev_main()
+    else:
+        asyncio.run(main())

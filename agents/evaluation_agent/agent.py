@@ -110,6 +110,22 @@ class EnhancedEvaluationAgent(BaseAgent):
                 metrics={},
                 errors=[str(e)]
             )
+
+    def _convert_to_native(self, obj: Any) -> Any:
+        """Convert numpy types to native Python types for JSON serialization"""
+        if isinstance(obj, dict):
+            return {k: self._convert_to_native(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_to_native(v) for v in obj]
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, (bool, np.bool_)):
+            return bool(obj)
+        elif isinstance(obj, np.ndarray):
+            return self._convert_to_native(obj.tolist())
+        return obj
     
     async def validate_input(self, input_data: Dict[str, Any]) -> bool:
         """Validate evaluation task input"""

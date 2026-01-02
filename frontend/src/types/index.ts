@@ -33,6 +33,62 @@ export interface Job {
     max_retries: number;
     message: string | null;
     progress: number | null;
+    state_results: Record<string, unknown> | null;
+}
+
+// Stage-Specific Interfaces
+export interface ResearchStageResults {
+    query: string;
+    summary: string;
+    key_findings: string[];
+    hypotheses: Array<{
+        statement: string;
+        rationale: string;
+        confidence: number;
+    }>;
+    sources: Array<{
+        title: string;
+        url?: string;
+        relevance: number;
+    }>;
+}
+
+export interface DataStageResults {
+    summary: {
+        total_samples: number;
+        features: string[];
+        target?: string;
+        quality_score: number;
+    };
+    data_quality: {
+        missing_values: Record<string, number>;
+        correlations: Record<string, number>;
+        outliers: Record<string, number>;
+    };
+}
+
+export interface TrainingStageResults {
+    [model_type: string]: {
+        accuracy: number;
+        f1: number;
+        auc_roc: number;
+        training_time: number;
+        params: Record<string, any>;
+    };
+}
+
+export interface EvaluationStageResults {
+    recommendation: {
+        model_type: string;
+        score: number;
+        reasoning: string;
+    };
+    comparisons: Array<{
+        model_type: string;
+        metrics: Record<string, number>;
+        rank: number;
+    }>;
+    feature_importance: Record<string, number>;
 }
 
 // Job Result Interface
@@ -40,10 +96,10 @@ export interface JobResult {
     workflow_id: string;
     status: string;
     final_results?: {
-        research?: Record<string, unknown>;
-        data?: Record<string, unknown>;
-        training?: Record<string, unknown>;
-        evaluation?: Record<string, unknown>;
+        research?: ResearchStageResults;
+        data?: DataStageResults;
+        training?: TrainingStageResults;
+        evaluation?: EvaluationStageResults;
     };
     best_model?: {
         model_type: string;

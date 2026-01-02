@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface WSEvent {
-    type: 'job_status' | 'agent_progress' | 'metrics_update' | 'system_status' | 'log_message';
+    type: 'job_status' | 'agent_progress' | 'metrics_update' | 'system_status' | 'log_message' | 'stage_results';
     data: Record<string, any>;
     timestamp: string;
     job_id?: string;
@@ -28,7 +28,7 @@ export interface UseWebSocketReturn {
 
 export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketReturn {
     const {
-        url = `ws://${window.location.hostname}:8000/ws`,
+        url = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}/ws`,
         jobId,
         onMessage,
         onConnect,
@@ -47,6 +47,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     const connect = useCallback(() => {
         if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
+        // Ensure correctly formatted WebSocket URL
+        // If it's a job-specific connection, use the /job subpath
         const wsUrl = jobId ? `${url}/job/${jobId}` : url;
         const ws = new WebSocket(wsUrl);
 
@@ -142,6 +144,7 @@ export function useJobUpdates(jobId: string | undefined) {
     const [message, setMessage] = useState<string | null>(null);
     const [agentSteps, setAgentSteps] = useState<Record<string, any>[]>([]);
     const [logs, setLogs] = useState<{ level: string; message: string; timestamp: string }[]>([]);
+    const [stageResults, setStageResults] = useState<Record<string, any>>({});
 
     const handleMessage = useCallback((event: WSEvent) => {
         if (event.job_id !== jobId) return;
@@ -178,6 +181,13 @@ export function useJobUpdates(jobId: string | undefined) {
                     timestamp: event.timestamp
                 }]);
                 break;
+
+            case 'stage_results':
+                setStageResults(prev => ({
+                    ...prev,
+                    [event.data.stage]: event.data.stage_data
+                }));
+                break;
         }
     }, [jobId]);
 
@@ -194,6 +204,7 @@ export function useJobUpdates(jobId: string | undefined) {
         message,
         agentSteps,
         logs,
+        stageResults,
         lastEvent: ws.lastEvent
     };
 }

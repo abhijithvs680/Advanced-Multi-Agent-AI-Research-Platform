@@ -64,6 +64,11 @@
     overflow: hidden;
 }
 
+.table th:last-child,
+.table td:last-child {
+    text-align: right;
+}
+
 .job-link {
     color: var(--text-primary);
     text-decoration: none;
@@ -104,6 +109,7 @@
 .action-buttons {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 6px;
 }
 

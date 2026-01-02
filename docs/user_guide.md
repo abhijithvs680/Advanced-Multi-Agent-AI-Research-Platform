@@ -161,19 +161,30 @@ Initialized → Research → Data Collection → Training → Evaluation → Com
 
 ### Model Results
 
-**Best Model:**
-- Model type (Random Forest, XGBoost, etc.)
-- Performance score
-- Hyperparameters used
+The **Training** tab visualizes the model building process. It has two modes depending on the data available:
 
-**Metrics:**
-- Accuracy, Precision, Recall
-- F1 Score, AUC-ROC
-- Training time
+**1. Detailed Comparison View**
+(Available when full metrics are computed)
+- **Best Model**: Highlighted properly with its type (e.g., Random Forest) and primary score.
+- **Model Comparison Chart**: A bar chart comparing accuracy across all trained models (RF, XGBoost, Neural Nets).
+- **Hyperparameters**: detailed view of the configuration used for the best model.
+
+**2. Summary View**
+(Fallback for legacy or simple runs)
+- Displays key metrics: Best Accuracy, Total Models Trained, and Training Time.
+- Shows a notification if detailed comparisons are unavailable.
+
+**Metrics Tracked:**
+- **Accuracy**: Overall correctness.
+- **F1 Score**: Balance between precision and recall (crucial for imbalanced data).
+- **AUC-ROC**: Ability to distinguish between classes.
+- **Training Time**: Efficiency of the model.
 
 **Explanations:**
-- Feature importance ranking
-- SHAP values (if available)
+- **Feature Importance**: Which variables drove the decisions.
+- **SHAP Values**: Detailed contribution of each feature (if enabled).
+
+> **Note on Persistence**: The system automatically saves progress. You can refresh the page or close the browser tab without losing the current job state. When you return, the live data will reconnect automatically.
 
 ### Statistical Analysis
 

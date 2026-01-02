@@ -56,6 +56,7 @@ class Job(Base):
     # Configuration and results
     config = Column(JSON, nullable=True)  # Job-specific configuration
     result = Column(JSON, nullable=True)  # Final workflow result
+    state_results = Column(JSON, nullable=True)  # Stage results for UI visualization
     error_message = Column(Text, nullable=True)
     
     # MLflow tracking

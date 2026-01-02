@@ -80,6 +80,9 @@ class JobResponse(BaseModel):
     retry_count: int
     max_retries: int
     
+    # Stage results for UI visualization
+    state_results: Optional[Dict[str, Any]] = None
+    
     model_config = ConfigDict(from_attributes=True)
 
 
