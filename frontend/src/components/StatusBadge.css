@@ -1,0 +1,16 @@
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.status-running .status-dot {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Ensure no double dots if index.css leaks */
+.status-badge::before {
+    display: none !important;
+}

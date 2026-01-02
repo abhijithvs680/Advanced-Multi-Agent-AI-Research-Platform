@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  width="256"
+  height="256"
+  viewBox="0 0 256 256"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="Brain icon">
+
+  <!-- Background -->
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="#8B5CF6"/>
+
+  <!-- Brain outline -->
+  <path
+    d="
+      M128 64
+      C92 64 72 92 80 120
+      C56 132 60 172 96 176
+      C104 196 128 196 128 196
+      C128 196 152 196 160 176
+      C196 172 200 132 176 120
+      C184 92 164 64 128 64
+      Z
+    "
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="10"
+    stroke-linejoin="round"
+  />
+
+  <!-- Brain folds (left) -->
+  <path d="M104 84 C92 92 92 108 104 116" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M96 120 C84 132 88 148 104 152" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M108 152 C96 164 108 176 120 172" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- Brain folds (right) -->
+  <path d="M152 84 C164 92 164 108 152 116" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M160 120 C172 132 168 148 152 152" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M148 152 C160 164 148 176 136 172" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- Center split -->
+  <line
+    x1="128"
+    y1="72"
+    x2="128"
+    y2="188"
+    stroke="#FFFFFF"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
+</svg>
