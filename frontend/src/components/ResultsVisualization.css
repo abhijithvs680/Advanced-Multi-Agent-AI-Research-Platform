@@ -1,0 +1,67 @@
+/* Results Visualization Styles */
+
+.results-visualization {
+    padding: 0;
+}
+
+.results-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+/* Detailed Metrics with Progress Rings */
+.detailed-metrics {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.metrics-rings {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+/* Training History */
+.training-history {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.spark-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.spark-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .metrics-rings {
+        justify-content: center;
+    }
+
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+}

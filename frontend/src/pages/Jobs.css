@@ -1,0 +1,128 @@
+.jobs-page {
+    max-width: 1400px;
+}
+
+/* Filters Bar */
+.filters-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.filters-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-secondary);
+}
+
+.filter-select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.filter-select option {
+    background: var(--bg-secondary);
+}
+
+.filter-input {
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    width: 200px;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Jobs Table */
+.jobs-table-container {
+    overflow: hidden;
+}
+
+.job-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.job-link:hover {
+    color: var(--accent-primary);
+}
+
+.domain-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.state-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+.date-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.duration-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-buttons .btn-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 16px;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+}

@@ -1,0 +1,51 @@
+# Multi-Agent AI Research Assistant Configuration
+
+agents:
+  research:
+    name: "research"
+    type: "research_agent"
+    llm_model: "gpt-4o"
+    temperature: 0.7
+    max_retries: 3
+    timeout: 300
+    
+  data:
+    name: "data"
+    type: "data_agent"
+    max_retries: 3
+    timeout: 600
+    cache_enabled: true
+    
+  training:
+    name: "training"
+    type: "training_agent"
+    max_retries: 2
+    timeout: 3600
+    gpu_enabled: true
+    
+  evaluation:
+    name: "evaluation"
+    type: "evaluation_agent"
+    max_retries: 3
+    timeout: 600
+
+orchestration:
+  max_iterations: 5
+  feedback_enabled: true
+  auto_escalation: true
+  human_in_loop: false
+  
+storage:
+  type: "postgresql"
+  host: "localhost"
+  port: 5432
+  database: "research_assistant"
+  
+logging:
+  level: "INFO"
+  format: "json"
+  output: "stdout"
+  
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "research_assistant"
